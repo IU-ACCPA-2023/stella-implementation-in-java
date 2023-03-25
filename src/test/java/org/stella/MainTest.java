@@ -3,6 +3,7 @@ package org.stella;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.*;
 import org.junit.jupiter.params.provider.*;
+import org.stella.typecheck.VisitTypeCheck;
 
 import static org.junit.jupiter.api.Assertions.*;
 import java.io.*;
@@ -38,7 +39,7 @@ class MainTest {
         boolean typecheckerFailed = false;
         try {
             Main.main(args); // TODO: check that if it fail then there is a type error actually, and not a problem with implementation
-        } catch (Exception e) {
+        } catch (VisitTypeCheck.TypeError e) {
             typecheckerFailed = true;
         }
         if (!typecheckerFailed) {
