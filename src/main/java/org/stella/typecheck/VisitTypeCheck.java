@@ -246,19 +246,20 @@ public class ExprVisitor implements org.syntax.stella.Absyn.Expr.Visitor<org.syn
       System.out.println("Visiting abstraction over " + paramDecl.stellaident_);
 
       if (arg.returnType == null) {
-        return p.expr_.accept(new ExprVisitor(), new ContextAndReturnType(newContext, null));
+        Type returnType = p.expr_.accept(new ExprVisitor(), new ContextAndReturnType(newContext, null));
+        ListType argTypes = new ListType();
+        argTypes.add(paramDecl.type_);
+        return new TypeFun(argTypes, returnType);
       } else {
-        Type newExpectedType = arg.returnType.accept(new TypeVisitor() {
-          @Override
-          public Type visit(TypeFun p, ContextAndReturnType arg) {
-            return p.type_;
-          }
-        }, null);
-        if (newExpectedType == null) {
+        Type expectedArgType, expectedReturnType;
+        try {
+          expectedArgType = ((TypeFun)arg.returnType).listtype_.get(0);
+          expectedReturnType = ((TypeFun)arg.returnType).type_;
+        } catch (Exception e) {
           throw new TypeError("expected a non-function type, but got anonymous function in expression " + PrettyPrinter.print(p));
         }
-
-        p.expr_.accept(new ExprVisitor(), new ContextAndReturnType(newContext, newExpectedType));
+        compareTypes(p, paramDecl.type_, expectedArgType);
+        p.expr_.accept(new ExprVisitor(), new ContextAndReturnType(newContext, expectedReturnType));
         return arg.returnType;
       }
     }
@@ -329,11 +330,12 @@ public class ExprVisitor implements org.syntax.stella.Absyn.Expr.Visitor<org.syn
         argType = ((TypeFun)funType).listtype_.get(0);
         retType = ((TypeFun)funType).type_;
       } catch (Exception e) {
-        throw new TypeError("Expected a function type but got ???");
+        throw new TypeError("Expected a function type but got " + PrettyPrinter.print(funType) + " for expression " + PrettyPrinter.print(p.expr_));
       }
 
       for (org.syntax.stella.Absyn.Expr x: p.listexpr_) {
         x.accept(new ExprVisitor(), new ContextAndReturnType(arg.context, argType));
+        System.out.println("Typechecking argument " + PrettyPrinter.print(x) + " against type " + PrettyPrinter.print(argType));
       }
       return compareTypes(p, retType, arg.returnType);
     }
