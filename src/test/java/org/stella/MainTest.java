@@ -28,6 +28,20 @@ class MainTest {
 
     @ParameterizedTest(name = "{index} Typechecking ill-typed program {0}")
     @ValueSource(strings = {
+            "tests/ill-typed/applying-non-function-1.stella",
+            "tests/ill-typed/applying-non-function-2.stella",
+            "tests/ill-typed/applying-non-function-3.stella",
+            "tests/ill-typed/argument-type-mismatch-1.stella",
+            "tests/ill-typed/argument-type-mismatch-2.stella",
+            "tests/ill-typed/argument-type-mismatch-3.stella",
+            "tests/ill-typed/bad-if-1.stella",
+            "tests/ill-typed/bad-if-2.stella",
+            "tests/ill-typed/bad-succ-1.stella",
+            "tests/ill-typed/bad-succ-2.stella",
+            "tests/ill-typed/bad-succ-3.stella",
+            "tests/ill-typed/shadowed-variable-1.stella",
+            "tests/ill-typed/undefined-variable-1.stella",
+            "tests/ill-typed/undefined-variable-2.stella",
             "tests/ill-typed/bad-squares-1.stella",
             "tests/ill-typed/bad-squares-2.stella"})
     public void testIllTyped(String filepath) throws IOException, Exception {
@@ -40,6 +54,7 @@ class MainTest {
         try {
             Main.main(args); // TODO: check that if it fail then there is a type error actually, and not a problem with implementation
         } catch (VisitTypeCheck.TypeError e) {
+            System.out.println("Type Error: " + e.getMessage());
             typecheckerFailed = true;
         }
         if (!typecheckerFailed) {
